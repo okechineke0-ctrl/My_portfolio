@@ -24,6 +24,17 @@ export const Navbar: React.FC<NavbarProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close mobile menu on resize to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize, { passive: true });
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const navLinks = [
     { label: 'About', href: '#about' },
     { label: 'Projects', href: '#projects' },
@@ -63,29 +74,31 @@ export const Navbar: React.FC<NavbarProps> = ({
           : 'bg-slate-950/70 backdrop-blur-sm border-b border-slate-800/50'
       }`}
     >
-      {/* 3-Zone Contract Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-6">
+      {/* Container */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-auto md:h-18 flex items-center justify-between gap-4 py-3 md:py-0">
         
         {/* Zone 1: Wordmark */}
         <a
           href="#about"
           onClick={(e) => handleNavClick(e, '#about')}
-          className="text-base sm:text-lg font-bold tracking-tight text-white hover:text-indigo-400 transition-colors whitespace-nowrap shrink-0 flex items-center gap-2.5"
+          className="text-sm sm:text-base lg:text-lg font-bold tracking-tight text-white hover:text-indigo-400 transition-colors whitespace-nowrap shrink-0 flex items-center gap-2 sm:gap-2.5"
         >
-          <span className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-mono font-bold text-sm shadow-md shadow-indigo-500/20">
+          <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-mono font-bold text-xs sm:text-sm shadow-md shadow-indigo-500/20">
             OS
           </span>
-          <span className="truncate max-w-[200px] sm:max-w-none">Okechineke Success C.</span>
+          <span className="hidden xs:inline truncate max-w-[150px] sm:max-w-[200px] lg:max-w-none">
+            Okechineke
+          </span>
         </a>
 
-        {/* Zone 2: Clean single-line navigation links */}
-        <nav className="hidden md:flex items-center gap-6 lg:gap-7 text-sm font-medium text-slate-300">
+        {/* Zone 2: Desktop Navigation Links */}
+        <nav className="hidden lg:flex items-center gap-6 lg:gap-8 text-sm font-medium text-slate-300 flex-1 justify-center">
           {navLinks.map((link) => (
             <a
               key={link.label}
               href={link.href}
               onClick={(e) => handleNavClick(e, link.href)}
-              className="hover:text-white transition-colors hover:underline underline-offset-4 decoration-indigo-500 whitespace-nowrap shrink-0 cursor-pointer"
+              className="hover:text-white transition-colors hover:underline underline-offset-4 decoration-indigo-500 whitespace-nowrap"
             >
               {link.label}
             </a>
@@ -93,26 +106,18 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             type="button"
             onClick={onOpenEstimator}
-            className="hover:text-white transition-colors hover:underline underline-offset-4 decoration-indigo-500 whitespace-nowrap shrink-0 text-slate-300 cursor-pointer"
+            className="hover:text-white transition-colors hover:underline underline-offset-4 decoration-indigo-500 whitespace-nowrap text-slate-300"
           >
-            Project Estimator
-          </button>
-          <button
-            type="button"
-            onClick={onOpenResume}
-            className="hover:text-white transition-colors hover:underline underline-offset-4 decoration-indigo-500 whitespace-nowrap shrink-0 flex items-center gap-1.5 text-slate-300 cursor-pointer"
-          >
-            <FileText className="w-3.5 h-3.5 text-indigo-400" />
-            Resume
+            Estimator
           </button>
         </nav>
 
-        {/* Zone 3: Primary Actions */}
-        <div className="hidden md:flex items-center gap-2.5 shrink-0">
+        {/* Zone 3: Desktop Actions */}
+        <div className="hidden lg:flex items-center gap-2.5 shrink-0">
           <button
             type="button"
             onClick={onOpenEmail}
-            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-200 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-lg transition-all cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold text-slate-200 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-lg transition-all whitespace-nowrap"
           >
             <Mail className="w-3.5 h-3.5 text-indigo-400" />
             <span>Email</span>
@@ -121,7 +126,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             href={PERSONAL_INFO.whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 rounded-lg transition-all whitespace-nowrap shadow-sm shadow-indigo-600/30"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 rounded-lg transition-all whitespace-nowrap"
           >
             <MessageSquare className="w-3.5 h-3.5" />
             <span>WhatsApp</span>
@@ -129,21 +134,23 @@ export const Navbar: React.FC<NavbarProps> = ({
           </a>
         </div>
 
-        {/* Mobile controls & Menu Hamburger trigger */}
-        <div className="flex items-center gap-2 md:hidden">
+        {/* Mobile Controls */}
+        <div className="flex items-center gap-1.5 md:gap-2 lg:hidden">
           <button
             type="button"
             onClick={onOpenEmail}
-            className="p-2 text-slate-300 hover:text-white rounded-xl bg-slate-900 border border-slate-800 cursor-pointer"
+            className="p-2.5 text-slate-300 hover:text-white rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 cursor-pointer transition-colors active:scale-95"
             aria-label="Send email"
+            title="Email"
           >
             <Mail className="w-4 h-4 text-indigo-400" />
           </button>
 
           <a
             href={`tel:${PERSONAL_INFO.phone}`}
-            className="p-2 text-slate-300 hover:text-white rounded-xl bg-slate-900 border border-slate-800"
+            className="p-2.5 text-slate-300 hover:text-white rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 transition-colors active:scale-95"
             aria-label="Call phone number"
+            title="Call"
           >
             <Phone className="w-4 h-4 text-emerald-400" />
           </a>
@@ -151,7 +158,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2.5 text-slate-200 hover:text-white rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer transition-colors"
+            className="p-2.5 text-slate-200 hover:text-white rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 transition-colors active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-950 focus:ring-indigo-500"
             aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileMenuOpen}
           >
@@ -164,16 +171,16 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-slate-950/98 border-b border-slate-800 px-4 pt-3 pb-6 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-150">
-          <div className="flex flex-col space-y-1 pb-3">
+        <div className="lg:hidden bg-slate-950/98 border-t border-slate-800 px-4 pt-3 pb-6 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-150">
+          <div className="flex flex-col space-y-1 pb-4">
             {navLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
                 onClick={(e) => handleNavClick(e, link.href)}
-                className="px-3 py-2.5 text-sm font-semibold text-slate-200 hover:text-white hover:bg-slate-900 rounded-xl transition-colors cursor-pointer flex items-center justify-between"
+                className="px-3 py-3 text-sm font-semibold text-slate-200 hover:text-white hover:bg-slate-900 rounded-lg transition-colors cursor-pointer flex items-center justify-between active:scale-95"
               >
                 <span>{link.label}</span>
                 <span className="text-slate-600 text-xs">→</span>
@@ -186,9 +193,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 setMobileMenuOpen(false);
                 onOpenEstimator();
               }}
-              className="w-full text-left px-3 py-2.5 text-sm font-semibold text-slate-200 hover:text-white hover:bg-slate-900 rounded-xl transition-colors cursor-pointer flex items-center justify-between"
+              className="w-full text-left px-3 py-3 text-sm font-semibold text-slate-200 hover:text-white hover:bg-slate-900 rounded-lg transition-colors cursor-pointer flex items-center justify-between active:scale-95"
             >
-              <span>Project Scope Estimator</span>
+              <span>Project Estimator</span>
               <span className="text-indigo-400 text-xs">Calculate</span>
             </button>
 
@@ -198,34 +205,35 @@ export const Navbar: React.FC<NavbarProps> = ({
                 setMobileMenuOpen(false);
                 onOpenResume();
               }}
-              className="w-full text-left px-3 py-2.5 text-sm font-semibold text-indigo-400 hover:text-indigo-300 hover:bg-slate-900 rounded-xl transition-colors cursor-pointer flex items-center gap-2"
+              className="w-full text-left px-3 py-3 text-sm font-semibold text-indigo-400 hover:text-indigo-300 hover:bg-slate-900 rounded-lg transition-colors cursor-pointer flex items-center gap-2 active:scale-95"
             >
               <FileText className="w-4 h-4" />
-              <span>View Executive Resume / CV</span>
+              <span>View Resume</span>
             </button>
           </div>
 
-          <div className="pt-3 border-t border-slate-800/80 flex flex-col gap-2">
+          <div className="pt-4 border-t border-slate-800/80 flex flex-col gap-2">
             <button
               type="button"
               onClick={() => {
                 setMobileMenuOpen(false);
                 onOpenEmail();
               }}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-semibold text-slate-100 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl transition-colors cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 text-xs font-semibold text-slate-100 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-lg transition-colors active:scale-95"
             >
               <Mail className="w-4 h-4 text-indigo-400" />
-              <span>Email Success (okechineke0@gmail.com)</span>
+              <span>Send Email</span>
             </button>
 
             <a
               href={PERSONAL_INFO.whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-colors"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors active:scale-95"
             >
               <MessageSquare className="w-4 h-4" />
-              <span>WhatsApp Direct (+234 814 657 8477)</span>
+              <span>WhatsApp Direct</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
             </a>
           </div>
         </div>
