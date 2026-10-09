@@ -5,9 +5,10 @@ import { Phone, Mail, MessageSquare, ArrowUp, ArrowUpRight } from 'lucide-react'
 interface FooterProps {
   onOpenResume: () => void;
   onOpenEstimator: () => void;
+  onOpenEmail: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onOpenResume, onOpenEstimator }) => {
+export const Footer: React.FC<FooterProps> = ({ onOpenResume, onOpenEstimator, onOpenEmail }) => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -66,12 +67,13 @@ export const Footer: React.FC<FooterProps> = ({ onOpenResume, onOpenEstimator })
               <span>WhatsApp</span>
               <ArrowUpRight className="w-3 h-3" />
             </a>
-            <a
-              href={`mailto:${PERSONAL_INFO.email}`}
-              className="text-slate-400 hover:text-indigo-400 transition-colors flex items-center gap-1"
+            <button
+              type="button"
+              onClick={onOpenEmail}
+              className="text-slate-400 hover:text-indigo-400 transition-colors flex items-center gap-1 cursor-pointer"
             >
               <span>{PERSONAL_INFO.email}</span>
-            </a>
+            </button>
             <button
               onClick={scrollToTop}
               className="p-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"

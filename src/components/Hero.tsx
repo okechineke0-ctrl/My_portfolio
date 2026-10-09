@@ -20,9 +20,10 @@ import {
 interface HeroProps {
   onOpenResume: () => void;
   onOpenEstimator: () => void;
+  onOpenEmail: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onOpenResume, onOpenEstimator }) => {
+export const Hero: React.FC<HeroProps> = ({ onOpenResume, onOpenEstimator, onOpenEmail }) => {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [imageError, setImageError] = useState(false);
 
@@ -243,13 +244,14 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume, onOpenEstimator }) => 
                     <Phone className="w-3.5 h-3.5 text-indigo-400" />
                     <span>Call 08146578477</span>
                   </a>
-                  <a
-                    href={`mailto:${PERSONAL_INFO.email}`}
-                    className="flex items-center justify-center gap-2 py-2 px-3 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-colors"
+                  <button
+                    type="button"
+                    onClick={onOpenEmail}
+                    className="flex items-center justify-center gap-2 py-2 px-3 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-colors cursor-pointer"
                   >
                     <Mail className="w-3.5 h-3.5" />
                     <span>Send Email</span>
-                  </a>
+                  </button>
                 </div>
               </div>
 

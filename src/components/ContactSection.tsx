@@ -12,10 +12,17 @@ import {
   Building2, 
   ShieldCheck, 
   CheckCircle2, 
-  Clock 
+  Clock,
+  ExternalLink,
+  Sparkles,
+  RefreshCw
 } from 'lucide-react';
 
-export const ContactSection: React.FC = () => {
+interface ContactSectionProps {
+  onOpenEmail: (subject?: string, body?: string) => void;
+}
+
+export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenEmail }) => {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formData, setFormData] = useState({
@@ -29,18 +36,57 @@ export const ContactSection: React.FC = () => {
   const handleCopy = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
     setCopiedField(field);
-    setTimeout(() => setCopiedField(null), 2000);
+    setTimeout(() => setCopiedField(null), 2500);
+  };
+
+  const getFormMessageBody = () => {
+    return `Client Name: ${formData.name || 'Not provided'}\nClient Email: ${formData.email || 'Not provided'}\nClient Phone: ${formData.phone || 'Not provided'}\nRequested Scope: ${formData.projectScope}\n\nProject Requirements / Brief:\n${formData.message}`;
+  };
+
+  const getGmailUrl = () => {
+    const subject = encodeURIComponent(`Project Collaboration - ${formData.name || 'New Client'}`);
+    const body = encodeURIComponent(getFormMessageBody());
+    return `https://mail.google.com/mail/?view=cm&fs=1&to=${PERSONAL_INFO.email}&su=${subject}&body=${body}`;
+  };
+
+  const getMailtoUrl = () => {
+    const subject = encodeURIComponent(`Project Collaboration - ${formData.name || 'New Client'}`);
+    const body = encodeURIComponent(getFormMessageBody());
+    return `mailto:${PERSONAL_INFO.email}?subject=${subject}&body=${body}`;
+  };
+
+  const getWhatsAppUrl = () => {
+    const text = encodeURIComponent(
+      `Hello Okechineke Success, I am submitting a project inquiry:\n\nName: ${formData.name}\nEmail: ${formData.email}\nScope: ${formData.projectScope}\n\n${formData.message}`
+    );
+    return `https://wa.me/2348146578477?text=${text}`;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Format mailto action
-    const subject = encodeURIComponent(`Project Collaboration from ${formData.name}`);
-    const body = encodeURIComponent(
-      `Name: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone || 'N/A'}\nService: ${formData.projectScope}\n\nProject Details:\n${formData.message}`
-    );
-    window.location.href = `mailto:${PERSONAL_INFO.email}?subject=${subject}&body=${body}`;
+    // Copy the prepared message to clipboard so nothing is ever lost
+    navigator.clipboard.writeText(`To: ${PERSONAL_INFO.email}\n\n${getFormMessageBody()}`);
+    
+    // Set form as submitted to display the interactive dispatch controls
     setFormSubmitted(true);
+
+    // Try opening Gmail web in a new tab safely
+    try {
+      window.open(getGmailUrl(), '_blank');
+    } catch (err) {
+      // Fallback
+    }
+  };
+
+  const handleResetForm = () => {
+    setFormSubmitted(false);
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      projectScope: 'Full-Stack Web Application',
+      message: ''
+    });
   };
 
   return (
@@ -82,8 +128,9 @@ export const ContactSection: React.FC = () => {
 
                 <div className="flex items-center gap-1.5">
                   <button
+                    type="button"
                     onClick={() => handleCopy(PERSONAL_INFO.phone, 'phone')}
-                    className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+                    className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
                     title="Copy phone number"
                   >
                     {copiedField === 'phone' ? (
@@ -94,7 +141,7 @@ export const ContactSection: React.FC = () => {
                   </button>
                   <a
                     href={`tel:${PERSONAL_INFO.phone}`}
-                    className="px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors"
+                    className="px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors cursor-pointer"
                   >
                     Call Now
                   </a>
@@ -121,7 +168,7 @@ export const ContactSection: React.FC = () => {
                   href={PERSONAL_INFO.whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-colors"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-colors cursor-pointer"
                 >
                   <span>Chat Now</span>
                   <ArrowUpRight className="w-3.5 h-3.5" />
@@ -129,7 +176,7 @@ export const ContactSection: React.FC = () => {
               </div>
             </div>
 
-            {/* Email Card */}
+            {/* Email Card (100% Responsive Modal / Compose trigger) */}
             <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 hover:border-slate-700 transition-colors">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -138,7 +185,7 @@ export const ContactSection: React.FC = () => {
                   </div>
                   <div>
                     <div className="text-xs text-slate-400">Email Address</div>
-                    <div className="text-sm sm:text-base font-bold text-white mt-0.5 truncate max-w-[180px] sm:max-w-none">
+                    <div className="text-sm sm:text-base font-bold text-white mt-0.5 truncate max-w-[170px] sm:max-w-none">
                       {PERSONAL_INFO.email}
                     </div>
                   </div>
@@ -146,8 +193,9 @@ export const ContactSection: React.FC = () => {
 
                 <div className="flex items-center gap-1.5">
                   <button
+                    type="button"
                     onClick={() => handleCopy(PERSONAL_INFO.email, 'email')}
-                    className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+                    className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
                     title="Copy email address"
                   >
                     {copiedField === 'email' ? (
@@ -156,12 +204,13 @@ export const ContactSection: React.FC = () => {
                       <Copy className="w-4 h-4" />
                     )}
                   </button>
-                  <a
-                    href={`mailto:${PERSONAL_INFO.email}`}
-                    className="px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors"
+                  <button
+                    type="button"
+                    onClick={() => onOpenEmail()}
+                    className="px-3 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors cursor-pointer"
                   >
                     Send Email
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
@@ -195,22 +244,78 @@ export const ContactSection: React.FC = () => {
               </p>
 
               {formSubmitted ? (
-                <div className="p-6 rounded-2xl bg-indigo-950/40 border border-indigo-800/60 text-center space-y-3">
-                  <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
-                  <h4 className="text-lg font-bold text-white">Inquiry Dispatched!</h4>
-                  <p className="text-xs text-slate-300 max-w-md mx-auto">
-                    Your email client has been prepared with your project details for <span className="text-indigo-300">{PERSONAL_INFO.email}</span>. You can also message Success immediately on WhatsApp.
-                  </p>
-                  <div className="pt-2">
+                <div className="p-6 rounded-2xl bg-slate-950/90 border border-slate-800 text-center space-y-4 animate-in fade-in zoom-in-95 duration-200">
+                  <div className="w-12 h-12 rounded-full bg-emerald-950 border border-emerald-800 flex items-center justify-center mx-auto text-emerald-400">
+                    <CheckCircle2 className="w-7 h-7" />
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-lg font-bold text-white">Inquiry Ready to Dispatch!</h4>
+                    <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto mt-1">
+                      Your message has been formatted for <strong className="text-indigo-400 font-mono">{PERSONAL_INFO.email}</strong> and copied to your clipboard. Choose your preferred send channel:
+                    </p>
+                  </div>
+
+                  {/* Multi-Channel 100% Reliable Delivery Options */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 max-w-md mx-auto">
                     <a
-                      href={PERSONAL_INFO.whatsappUrl}
+                      href={getGmailUrl()}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl transition-colors"
+                      className="flex items-center justify-center gap-2 py-3 px-4 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-all shadow-md shadow-indigo-600/30"
+                    >
+                      <Send className="w-4 h-4" />
+                      <span>Open in Gmail (Web)</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+
+                    <a
+                      href={getWhatsAppUrl()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 py-3 px-4 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl transition-all shadow-md shadow-emerald-600/30"
                     >
                       <MessageSquare className="w-4 h-4" />
-                      Follow up on WhatsApp
+                      <span>Send on WhatsApp</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
                     </a>
+
+                    <a
+                      href={getMailtoUrl()}
+                      className="flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-semibold text-slate-200 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl transition-colors"
+                    >
+                      <Mail className="w-4 h-4 text-indigo-400" />
+                      <span>Default Mail App</span>
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={() => handleCopy(getFormMessageBody(), 'message_copy')}
+                      className="flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-semibold text-slate-200 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl transition-colors cursor-pointer"
+                    >
+                      {copiedField === 'message_copy' ? (
+                        <>
+                          <Check className="w-4 h-4 text-emerald-400" />
+                          <span className="text-emerald-400">Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          <span>Copy Message Text</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  <div className="pt-3 border-t border-slate-800/80">
+                    <button
+                      type="button"
+                      onClick={handleResetForm}
+                      className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors cursor-pointer"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      <span>Send Another Inquiry</span>
+                    </button>
                   </div>
                 </div>
               ) : (
@@ -266,7 +371,7 @@ export const ContactSection: React.FC = () => {
                       <select
                         value={formData.projectScope}
                         onChange={(e) => setFormData({ ...formData, projectScope: e.target.value })}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500 cursor-pointer"
                       >
                         <option value="Full-Stack Web Application">Full-Stack Web Application (React + Node)</option>
                         <option value="Cross-Platform Mobile App">Cross-Platform Mobile App (React Native)</option>
@@ -300,7 +405,7 @@ export const ContactSection: React.FC = () => {
 
                     <button
                       type="submit"
-                      className="inline-flex items-center gap-2 px-6 py-3 text-xs sm:text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-all shadow-md shadow-indigo-600/30"
+                      className="inline-flex items-center gap-2 px-6 py-3 text-xs sm:text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 active:scale-95 rounded-xl transition-all shadow-md shadow-indigo-600/30 cursor-pointer"
                     >
                       <Send className="w-4 h-4" />
                       <span>Send Project Message</span>

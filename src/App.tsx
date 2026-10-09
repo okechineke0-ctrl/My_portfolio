@@ -9,19 +9,30 @@ import { TechStack } from './components/TechStack';
 import { ContactSection } from './components/ContactSection';
 import { ProjectEstimator } from './components/ProjectEstimator';
 import { ResumeModal } from './components/ResumeModal';
+import { EmailModal } from './components/EmailModal';
 import { Footer } from './components/Footer';
 
 export default function App() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [resumeOpen, setResumeOpen] = useState(false);
   const [estimatorOpen, setEstimatorOpen] = useState(false);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [emailSubject, setEmailSubject] = useState<string | undefined>(undefined);
+  const [emailBody, setEmailBody] = useState<string | undefined>(undefined);
+
+  const handleOpenEmail = (subject?: string, body?: string) => {
+    setEmailSubject(subject);
+    setEmailBody(body);
+    setEmailModalOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-indigo-600 selection:text-white">
-      {/* 3-Zone Navigation */}
+      {/* 3-Zone Navigation with Responsive Menu & Smooth Scroll */}
       <Navbar 
         onOpenResume={() => setResumeOpen(true)}
         onOpenEstimator={() => setEstimatorOpen(true)}
+        onOpenEmail={() => handleOpenEmail()}
       />
 
       {/* Hero Section with Split View, Executive Portrait & KPI Strip */}
@@ -29,6 +40,7 @@ export default function App() {
         <Hero 
           onOpenResume={() => setResumeOpen(true)}
           onOpenEstimator={() => setEstimatorOpen(true)}
+          onOpenEmail={() => handleOpenEmail()}
         />
 
         {/* Featured Projects Bento Showcase */}
@@ -43,13 +55,16 @@ export default function App() {
         <TechStack />
 
         {/* Direct Client Access & Contact Section */}
-        <ContactSection />
+        <ContactSection 
+          onOpenEmail={(subject, body) => handleOpenEmail(subject, body)}
+        />
       </main>
 
       {/* Footer */}
       <Footer 
         onOpenResume={() => setResumeOpen(true)}
         onOpenEstimator={() => setEstimatorOpen(true)}
+        onOpenEmail={() => handleOpenEmail()}
       />
 
       {/* Interactive Project Architecture Deep-Dive Modal */}
@@ -68,6 +83,14 @@ export default function App() {
       <ResumeModal 
         isOpen={resumeOpen}
         onClose={() => setResumeOpen(false)}
+      />
+
+      {/* 100% Responsive Email Modal (Gmail Web / Mail Client / WhatsApp / Copy) */}
+      <EmailModal
+        isOpen={emailModalOpen}
+        onClose={() => setEmailModalOpen(false)}
+        initialSubject={emailSubject}
+        initialBody={emailBody}
       />
     </div>
   );
