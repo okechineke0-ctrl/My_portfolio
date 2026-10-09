@@ -25,7 +25,26 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ onOpenResume, onOpenEstimator, onOpenEmail }) => {
   const [copiedField, setCopiedField] = useState<string | null>(null);
-  const [imageError, setImageError] = useState(false);
+  
+  const candidateImages = [
+    '/profile.png',
+    '/profile.jpg',
+    '/profile.jpeg',
+    '/profile.webp',
+    '/profile-picture.png',
+    '/profile-picture.jpg',
+    '/file_00000000945081f6b741582314a697ec.png'
+  ];
+  const [imageIndex, setImageIndex] = useState(0);
+  const [allImagesFailed, setAllImagesFailed] = useState(false);
+
+  const handleImageError = () => {
+    if (imageIndex < candidateImages.length - 1) {
+      setImageIndex(imageIndex + 1);
+    } else {
+      setAllImagesFailed(true);
+    }
+  };
 
   const handleCopy = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
@@ -169,12 +188,12 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume, onOpenEstimator, onOpe
               
               {/* Permanent Photo Frame */}
               <div className="relative aspect-square rounded-2xl overflow-hidden bg-slate-950 border border-slate-800/80 mb-5 shadow-inner flex items-center justify-center">
-                {!imageError ? (
+                {!allImagesFailed ? (
                   <img
-                    src="/file_00000000945081f6b741582314a697ec.png"
+                    src={candidateImages[imageIndex]}
                     alt="Okechineke Success Chiemerie - CEO Ocean Technologies"
                     className="w-full h-full object-cover object-top"
-                    onError={() => setImageError(true)}
+                    onError={handleImageError}
                   />
                 ) : (
                   <div className="w-full h-full relative flex flex-col items-center justify-center p-6 text-center bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900">
