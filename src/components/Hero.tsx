@@ -118,7 +118,15 @@ export const Hero: React.FC<HeroProps> = ({
               {/* Image Container */}
               <div className="relative overflow-hidden rounded-3xl border-2 border-indigo-600/50 shadow-2xl shadow-indigo-600/20 bg-gradient-to-br from-slate-900 to-slate-950">
                 <img
-                  src="/file_00000000945081f6b741582314a697ec.png"
+                  src="/profile.png"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (target.src.endsWith('/profile.png')) {
+                      target.src = '/file_00000000945081f6b741582314a697ec.png';
+                    } else if (target.src.endsWith('/file_00000000945081f6b741582314a697ec.png')) {
+                      target.src = '/profile.jpg';
+                    }
+                  }}
                   alt="Okechineke Success - Full Stack Engineer"
                   className="w-full h-auto object-cover aspect-square hover:scale-105 transition-transform duration-500"
                 />
